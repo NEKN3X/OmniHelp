@@ -70,6 +70,7 @@ const manifest = {
   side_panel: {
     default_path: 'side-panel/index.html',
   },
+  omnibox: { keyword: '>' },
 } satisfies chrome.runtime.ManifestV3;
 
 export default manifest;
