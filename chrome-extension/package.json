@@ -22,6 +22,7 @@
     "@extension/env": "workspace:*",
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
+    "fuse.js": "^7.1.0",
     "vite-plugin-node-polyfills": "^0.23.0",
     "webextension-polyfill": "^0.12.0"
   },
