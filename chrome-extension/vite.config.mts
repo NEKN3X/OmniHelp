@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { resolve } from 'node:path';
 import { defineConfig, type PluginOption } from 'vite';
 import libAssetsPlugin from '@laynezh/vite-plugin-lib-assets';
@@ -49,4 +50,5 @@ export default defineConfig({
       external: ['chrome'],
     },
   },
+  test: {},
 });
