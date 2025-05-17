@@ -21,13 +21,16 @@ export const pure = <T>(x: T): Parser<T> => {
 
 export const ap = <A, B>(pg: Parser<(x: A) => B>, px: Parser<A>): Parser<B> => {
   return input =>
-    match(pg(input))
+    match(parse(pg)(input))
       .with([], () => [])
       .otherwise(([[g, out]]) => parse(fmap(g, px))(out));
 };
 
-export const bind = <A, B>(pa: Parser<A>, f: (x: A) => Parser<B>): Parser<B> => {
-  return input => pa(input).flatMap(([v, out]) => f(v)(out));
+export const bind = <A, B>(p: Parser<A>, f: (x: A) => Parser<B>): Parser<B> => {
+  return input =>
+    match(parse(p)(input))
+      .with([], () => [])
+      .otherwise(([[v, out]]) => parse(f(v))(out));
 };
 
 export const empty: Parser<never> = _ => [];
