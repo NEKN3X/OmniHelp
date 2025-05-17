@@ -1,5 +1,23 @@
 import { expect, test } from 'vitest';
-import { ap, bind, char, empty, fmap, item, many, orElse, parse, pure, sat, some, str } from './parser';
+import {
+  ap,
+  bind,
+  char,
+  digit,
+  empty,
+  fmap,
+  int,
+  item,
+  many,
+  nat,
+  orElse,
+  parse,
+  pure,
+  sat,
+  some,
+  space,
+  str,
+} from './parser';
 
 const glossary: Glossary = {
   letter: '(a|b)',
@@ -74,8 +92,6 @@ test('orElse', () => {
   expect(result('')).toEqual([['d', '']]);
 });
 
-const digit = sat(x => /\d/.test(x));
-
 test('digit', () => {
   const result = parse(digit);
   expect(result('123abc')).toEqual([['1', '23abc']]);
@@ -110,8 +126,6 @@ test('some', () => {
   expect(result('')).toEqual([]);
 });
 
-const isSpace = (x: string) => /\s/.test(x);
-const space = bind(many(sat(isSpace)), () => pure(null));
 test('space', () => {
   const result = parse(space);
   expect(result('   abc')).toEqual([[null, 'abc']]);
@@ -119,7 +133,6 @@ test('space', () => {
   expect(result('')).toEqual([[null, '']]);
 });
 
-const nat = bind(some(digit), (xs: string[]) => pure(parseInt(xs.join(''), 10)));
 test('nat', () => {
   const result = parse(nat);
   expect(result('123abc')).toEqual([[123, 'abc']]);
@@ -128,10 +141,6 @@ test('nat', () => {
   expect(result('')).toEqual([]);
 });
 
-const int = orElse(
-  bind(char('-'), () => bind(nat, (n: number) => pure(-n))),
-  nat,
-);
 test('int', () => {
   const result = parse(int);
   expect(result('123abc')).toEqual([[123, 'abc']]);

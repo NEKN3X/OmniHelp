@@ -46,6 +46,11 @@ export const sat = (predicate: (x: string) => boolean): Parser<string> => {
   return bind(item, x => (predicate(x) ? pure(x) : empty));
 };
 
+export const digit = sat(x => /\d/.test(x));
+export const lower = sat(x => /[a-z]/.test(x));
+export const upper = sat(x => /[A-Z]/.test(x));
+export const letter = sat(x => /[a-zA-Z]/.test(x));
+export const alphanum = sat(x => /[a-zA-Z0-9]/.test(x));
 export const char = (x: string) => sat(y => x === y);
 
 export const str = (s: string): Parser<string> => {
@@ -70,3 +75,13 @@ export const some = <T>(parser: Parser<T>): Parser<T[]> => {
     defer(() => many(parser)),
   );
 };
+
+export const ident = bind(lower, x => bind(many(alphanum), xs => pure(x + xs.join(''))));
+export const nat = bind(some(digit), xs => pure(parseInt(xs.join(''), 10)));
+const isSpace = (x: string) => /\s/.test(x);
+export const space = bind(many(sat(isSpace)), () => pure(null));
+
+export const int = orElse(
+  bind(char('-'), () => bind(nat, (n: number) => pure(-n))),
+  nat,
+);
