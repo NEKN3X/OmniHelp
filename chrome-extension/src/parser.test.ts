@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { ap, bind, char, empty, fmap, item, orElse, parse, pure, sat, str } from './parser';
+import { ap, bind, char, empty, fmap, item, many, orElse, parse, pure, sat, some, str } from './parser';
 
 const glossary: Glossary = {
   letter: '(a|b)',
@@ -93,5 +93,49 @@ test('str', () => {
   const result = parse(str('abc'));
   expect(result('abcdef')).toEqual([['abc', 'def']]);
   expect(result('ab1234')).toEqual([]);
+  expect(result('')).toEqual([]);
+});
+
+test('many', () => {
+  const result = parse(many(digit));
+  expect(result('123abc')).toEqual([[['1', '2', '3'], 'abc']]);
+  expect(result('abc')).toEqual([[[], 'abc']]);
+  expect(result('')).toEqual([[[], '']]);
+});
+
+test('some', () => {
+  const result = parse(some(digit));
+  expect(result('123abc')).toEqual([[['1', '2', '3'], 'abc']]);
+  expect(result('abc')).toEqual([]);
+  expect(result('')).toEqual([]);
+});
+
+const isSpace = (x: string) => /\s/.test(x);
+const space = bind(many(sat(isSpace)), () => pure(null));
+test('space', () => {
+  const result = parse(space);
+  expect(result('   abc')).toEqual([[null, 'abc']]);
+  expect(result('abc')).toEqual([[null, 'abc']]);
+  expect(result('')).toEqual([[null, '']]);
+});
+
+const nat = bind(some(digit), (xs: string[]) => pure(parseInt(xs.join(''), 10)));
+test('nat', () => {
+  const result = parse(nat);
+  expect(result('123abc')).toEqual([[123, 'abc']]);
+  expect(result('123 abc')).toEqual([[123, ' abc']]);
+  expect(result('abc')).toEqual([]);
+  expect(result('')).toEqual([]);
+});
+
+const int = orElse(
+  bind(char('-'), () => bind(nat, (n: number) => pure(-n))),
+  nat,
+);
+test('int', () => {
+  const result = parse(int);
+  expect(result('123abc')).toEqual([[123, 'abc']]);
+  expect(result('-123abc')).toEqual([[-123, 'abc']]);
+  expect(result('abc')).toEqual([]);
   expect(result('')).toEqual([]);
 });

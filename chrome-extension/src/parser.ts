@@ -54,18 +54,19 @@ export const str = (s: string): Parser<string> => {
     .otherwise(() => bind(char(s[0]), () => bind(str(s.slice(1)), () => pure(s))));
 };
 
-const maybe =
-  <T>(a: Parser<T>, b: Parser<T>): Parser<T> =>
-  input => {
-    const aResult = a(input);
-    switch (aResult.length) {
-      case 0:
-        return b(input);
-      default:
-        return aResult;
-    }
-  };
+export const many = <T>(parser: Parser<T>): Parser<T[]> => {
+  return orElse(some(parser), pure([]));
+};
 
-// export const many = <T>(parser: Parser<T>): Parser<T[]> => {
-//   return maybe(some(parser), pure([]));
-// };
+const defer = <T>(factory: () => Parser<T>): Parser<T> => {
+  return input => factory()(input);
+};
+export const some = <T>(parser: Parser<T>): Parser<T[]> => {
+  return ap(
+    ap(
+      pure((x: T) => (xs: T[]) => [x, ...xs]),
+      parser,
+    ),
+    defer(() => many(parser)),
+  );
+};
