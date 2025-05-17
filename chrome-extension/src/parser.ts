@@ -35,14 +35,9 @@ export const orElse = <A>(a: Parser<A>, b: Parser<A>): Parser<A> => {
       .otherwise(v => v);
 };
 
-export const split = (a: string) => {
-  return (n: number): [string, string] => [a.slice(0, n), a.slice(n)];
-};
+// predicateを満たす1文字用のパーサー
 export const sat = (predicate: (x: string) => boolean): Parser<string> => {
-  return input =>
-    match(input[0])
-      .when(predicate, () => [split(input)(1)])
-      .otherwise(() => []);
+  return bind(item, x => (predicate(x) ? pure(x) : empty));
 };
 
 export const char = (x: string) => sat(y => x === y);

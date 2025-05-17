@@ -24,6 +24,7 @@ test('fmap', () => {
 test('pure', () => {
   const result = parse(pure(1));
   expect(result('abc')).toEqual([[1, 'abc']]);
+  expect(result('')).toEqual([[1, '']]);
 });
 
 const three = ap(
@@ -49,12 +50,14 @@ test('three', () => {
   const result = parse(three);
   expect(result('abcdef')).toEqual([[['a', 'c'], 'def']]);
   expect(result('ab')).toEqual([]);
+  expect(result('')).toEqual([]);
 });
 
 test('three2', () => {
   const result = parse(three2);
   expect(result('abcdef')).toEqual([[['a', 'c'], 'def']]);
   expect(result('ab')).toEqual([]);
+  expect(result('')).toEqual([]);
 });
 
 test('empty', () => {
@@ -65,8 +68,10 @@ test('empty', () => {
 test('orElse', () => {
   const result = parse(orElse(item, pure('d')));
   expect(result('abc')).toEqual([['a', 'bc']]);
+  expect(result('')).toEqual([['d', '']]);
   const result2 = parse(orElse(empty, pure('d')));
   expect(result2('abc')).toEqual([['d', 'abc']]);
+  expect(result('')).toEqual([['d', '']]);
 });
 
 const digit = sat(x => /\d/.test(x));
@@ -74,16 +79,19 @@ const digit = sat(x => /\d/.test(x));
 test('digit', () => {
   const result = parse(digit);
   expect(result('123abc')).toEqual([['1', '23abc']]);
+  expect(result('')).toEqual([]);
 });
 
 test('char', () => {
   const result = parse(char('a'));
   expect(result('abc')).toEqual([['a', 'bc']]);
   expect(result('bcd')).toEqual([]);
+  expect(result('')).toEqual([]);
 });
 
 test('str', () => {
   const result = parse(str('abc'));
   expect(result('abcdef')).toEqual([['abc', 'def']]);
   expect(result('ab1234')).toEqual([]);
+  expect(result('')).toEqual([]);
 });
