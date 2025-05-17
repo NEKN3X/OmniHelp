@@ -85,3 +85,16 @@ export const int = orElse(
   bind(char('-'), () => bind(nat, (n: number) => pure(-n))),
   nat,
 );
+
+export const token = <T>(parser: Parser<T>): Parser<T> => {
+  return bind(space, () => bind(parser, v => pure(v)));
+};
+
+export const identifier = token(ident);
+export const natural = token(nat);
+export const integer = token(int);
+export const symbol = (s: string) => token(str(s));
+
+export const nats = bind(symbol(`[`), () =>
+  bind(natural, n => bind(many(bind(symbol(','), () => natural)), ns => bind(symbol(`]`), () => pure([n, ...ns])))),
+);

@@ -10,10 +10,10 @@ import {
   item,
   many,
   nat,
+  nats,
   orElse,
   parse,
   pure,
-  sat,
   some,
   space,
   str,
@@ -147,4 +147,11 @@ test('int', () => {
   expect(result('-123abc')).toEqual([[-123, 'abc']]);
   expect(result('abc')).toEqual([]);
   expect(result('')).toEqual([]);
+});
+
+test('nats', () => {
+  const result = parse(nats);
+  expect(result(' [1, 2, 3] ')).toEqual([[[1, 2, 3], ' ']]);
+  expect(result(' [1, 2] abc')).toEqual([[[1, 2], ' abc']]);
+  expect(result(' [1, 2,]')).toEqual([]);
 });
