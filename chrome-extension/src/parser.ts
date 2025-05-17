@@ -12,68 +12,45 @@ export const item: Parser<string> = input =>
     .otherwise(() => [[input[0], input.slice(1)]]);
 
 export const fmap = <A, B>(f: (x: A) => B, parser: Parser<A>): Parser<B> => {
-  return input => {
-    return parser(input).map(([x, rest]) => [f(x), rest]);
-  };
+  return input => parser(input).map(([x, rest]) => [f(x), rest]);
 };
 
 export const pure = <T>(x: T): Parser<T> => {
-  return input => {
-    return [[x, input]];
-  };
+  return input => [[x, input]];
 };
 
 export const ap = <A, B>(f: Parser<(x: A) => B>, pa: Parser<A>): Parser<B> => {
-  return input => {
-    const result = parse(f)(input);
-    return result.flatMap(([g, out]) => {
-      const p = fmap(g, pa);
-      return p(out);
-    });
-  };
+  return input => parse(f)(input).flatMap(([g, out]) => fmap(g, pa)(out));
 };
 
 export const bind = <A, B>(pa: Parser<A>, f: (x: A) => Parser<B>): Parser<B> => {
-  return input => {
-    const result = pa(input);
-    return result.flatMap(([v, out]) => {
-      return f(v)(out);
-    });
-  };
+  return input => pa(input).flatMap(([v, out]) => f(v)(out));
 };
 
 export const empty: Parser<never> = _ => [];
-export const orElse =
-  <A>(a: Parser<A>, b: Parser<A>): Parser<A> =>
-  input => {
-    const aResult = a(input);
-    switch (aResult.length) {
-      case 0:
-        return b(input);
-      default:
-        return aResult;
-    }
-  };
+export const orElse = <A>(a: Parser<A>, b: Parser<A>): Parser<A> => {
+  return input =>
+    match(a(input))
+      .with([], _ => b(input))
+      .otherwise(v => v);
+};
 
-export const sat =
-  (predicate: (x: string) => boolean): Parser<string> =>
-  input => {
-    if (predicate(input[0])) {
-      return [[input[0], input.slice(1)]];
-    } else {
-      return [];
-    }
-  };
+export const split = (a: string) => {
+  return (n: number): [string, string] => [a.slice(0, n), a.slice(n)];
+};
+export const sat = (predicate: (x: string) => boolean): Parser<string> => {
+  return input =>
+    match(input[0])
+      .when(predicate, () => [split(input)(1)])
+      .otherwise(() => []);
+};
 
 export const char = (x: string) => sat(y => x === y);
 
 export const str = (s: string): Parser<string> => {
-  switch (s.length) {
-    case 0:
-      return pure(s);
-    default:
-      return bind(char(s[0]), () => bind(str(s.slice(1)), () => pure(s)));
-  }
+  return match(s)
+    .with('', () => pure(s))
+    .otherwise(() => bind(char(s[0]), () => bind(str(s.slice(1)), () => pure(s))));
 };
 
 const maybe =
