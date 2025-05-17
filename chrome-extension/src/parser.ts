@@ -98,3 +98,34 @@ export const symbol = (s: string) => token(str(s));
 export const nats = bind(symbol(`[`), () =>
   bind(natural, n => bind(many(bind(symbol(','), () => natural)), ns => bind(symbol(`]`), () => pure([n, ...ns])))),
 );
+
+export const factor: Parser<number> = orElse(
+  bind(symbol('('), () => bind(expr, e => bind(symbol(')'), () => pure(e)))),
+  natural,
+);
+export const term: Parser<number> = bind(factor, f =>
+  orElse(
+    bind(symbol('*'), () => bind(term, t => pure(f * t))),
+    pure(f),
+  ),
+);
+export const expr: Parser<number> = bind(term, t =>
+  orElse(
+    bind(symbol('+'), () => bind(expr, e => pure(t + e))),
+    orElse(
+      bind(symbol('-'), () => bind(expr, e => pure(t - e))),
+      pure(t),
+    ),
+  ),
+);
+export const evaluate = (xs: string) => {
+  return match(parse(expr)(xs))
+    .with([], () => {
+      throw new Error('Invalid input');
+    })
+    .with(P.array([P._, '']), ([[n, _]]) => n)
+    .with(P.array([P._, P.string]), ([[_, out]]) => {
+      throw new Error(`Unused input: ${out}`);
+    })
+    .exhaustive();
+};

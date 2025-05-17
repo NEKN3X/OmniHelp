@@ -5,6 +5,7 @@ import {
   char,
   digit,
   empty,
+  evaluate,
   fmap,
   int,
   item,
@@ -154,4 +155,12 @@ test('nats', () => {
   expect(result(' [1, 2, 3] ')).toEqual([[[1, 2, 3], ' ']]);
   expect(result(' [1, 2] abc')).toEqual([[[1, 2], ' abc']]);
   expect(result(' [1, 2,]')).toEqual([]);
+});
+
+test('evaluate', () => {
+  expect(evaluate('2 * 3 + 4')).toEqual(10);
+  expect(evaluate('2*3-10')).toEqual(-4);
+  expect(evaluate('2*(3+4)')).toEqual(14);
+  expect(() => evaluate('2*3^4')).toThrow('Unused input: ^4');
+  expect(() => evaluate('one plus two')).toThrow('Invalid input');
 });
