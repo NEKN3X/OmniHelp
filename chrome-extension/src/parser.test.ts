@@ -6,6 +6,8 @@ import {
   digit,
   empty,
   evaluate,
+  expr,
+  factor,
   fmap,
   int,
   item,
@@ -18,6 +20,7 @@ import {
   some,
   space,
   str,
+  term,
 } from './parser';
 
 const glossary: Glossary = {
@@ -155,6 +158,25 @@ test('nats', () => {
   expect(result(' [1, 2, 3] ')).toEqual([[[1, 2, 3], ' ']]);
   expect(result(' [1, 2] abc')).toEqual([[[1, 2], ' abc']]);
   expect(result(' [1, 2,]')).toEqual([]);
+});
+
+test('expr', () => {
+  expect(parse(expr)('2 * 3 + 4')).toEqual([[10, '']]);
+  expect(parse(expr)('2 * (3 + 4)')).toEqual([[14, '']]);
+  expect(parse(expr)('(2+(4+3)) * 4')).toEqual([[36, '']]);
+});
+test('term', () => {
+  expect(parse(term)('2 + 3 + 4')).toEqual([[2, ' + 3 + 4']]);
+  expect(parse(term)('2 + 3 * 4')).toEqual([[2, ' + 3 * 4']]);
+  expect(parse(term)('2 * 3 + 4')).toEqual([[6, ' + 4']]);
+  expect(parse(term)('(2 + 3) + 4')).toEqual([[5, ' + 4']]);
+  expect(parse(term)('2 * (3 + 4)')).toEqual([[14, '']]);
+  expect(parse(term)('(2+(4+3)) * 4')).toEqual([[36, '']]);
+});
+test('factor', () => {
+  expect(parse(factor)('2 * 3 + 4')).toEqual([[2, ' * 3 + 4']]);
+  expect(parse(factor)('2 * (3 + 4)')).toEqual([[2, ' * (3 + 4)']]);
+  expect(parse(factor)('(2+(4+3)) * 4')).toEqual([[9, ' * 4']]);
 });
 
 test('evaluate', () => {

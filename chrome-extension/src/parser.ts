@@ -1,6 +1,6 @@
 import { match, P } from 'ts-pattern';
 
-type Parser<T> = (input: string) => [T, string][];
+export type Parser<T> = (input: string) => [T, string][];
 
 export const parse = <T>(parser: Parser<T>) => {
   return (input: string) => parser(input);
@@ -63,7 +63,7 @@ export const many = <T>(parser: Parser<T>): Parser<T[]> => {
   return orElse(some(parser), pure([]));
 };
 
-const defer = <T>(factory: () => Parser<T>): Parser<T> => {
+export const defer = <T>(factory: () => Parser<T>): Parser<T> => {
   return input => factory()(input);
 };
 export const some = <T>(parser: Parser<T>): Parser<T[]> => {
