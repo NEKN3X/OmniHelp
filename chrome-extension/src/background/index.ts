@@ -1,25 +1,9 @@
 import 'webextension-polyfill';
 import Fuse from 'fuse.js';
 
-const suggests: Suggest[] = [
-  {
-    command: 'xyzに関する説明',
-    url: 'https://scrapbox.io/nekn3x/xyz',
-  },
-  {
-    command: 'xyzに関する説明2',
-    url: 'https://scrapbox.io/nekn3x/abc',
-  },
-  {
-    command: '123に関する説明',
-    url: 'https://scrapbox.io/nekn3x/123',
-  },
-];
-chrome.storage.local.set({ suggests0: suggests }, function () {});
-
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-  chrome.storage.local.get(null, v => {
-    const values: Suggest[][] = Object.values(v);
+  chrome.storage.local.get(null, items => {
+    const values: Suggest[][] = Object.values(items);
     const fuse = new Fuse(values.flat(), { keys: ['command'] });
     const result = fuse.search(text).map(i => ({
       content: i.item.url,

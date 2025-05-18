@@ -1,6 +1,7 @@
 interface Suggest {
-  command: string;
   url: string;
+  command: string;
+  expanded: string[];
 }
 
 interface Glossary {

@@ -1,62 +1,50 @@
 import '@src/Popup.css';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage } from '@extension/storage';
-import { t } from '@extension/i18n';
-import { ToggleButton } from '@extension/ui';
+import { withErrorBoundary, withSuspense } from '@extension/shared';
+import { ReactNode } from 'react';
+import { onClickRegister } from '@src/register';
+import { saveExample } from '../../../chrome-extension/src/storage';
 
-const notificationOptions = {
-  type: 'basic',
-  iconUrl: chrome.runtime.getURL('icon-34.png'),
-  title: 'Injecting content script error',
-  message: 'You cannot inject script here!',
-} as const;
-
+// ボタンを3つ並べる
+// 1. ページを登録する
+// 2. プロジェクト全体を登録する
+// 3. 設定を開く
 const Popup = () => {
-  const theme = useStorage(exampleThemeStorage);
-  const isLight = theme === 'light';
-  const logo = isLight ? 'popup/logo_vertical.svg' : 'popup/logo_vertical_dark.svg';
-  const goGithubSite = () =>
-    chrome.tabs.create({ url: 'https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite' });
-
-  const injectContentScript = async () => {
-    const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
-
-    if (tab.url!.startsWith('about:') || tab.url!.startsWith('chrome:')) {
-      chrome.notifications.create('inject-error', notificationOptions);
-    }
-
-    await chrome.scripting
-      .executeScript({
-        target: { tabId: tab.id! },
-        files: ['/content-runtime/index.iife.js'],
-      })
-      .catch(err => {
-        // Handling errors related to other paths
-        if (err.message.includes('Cannot access a chrome:// URL')) {
-          chrome.notifications.create('inject-error', notificationOptions);
-        }
-      });
-  };
-
   return (
-    <div className={`App ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-        <button onClick={goGithubSite}>
-          <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
-        </button>
-        <p>
-          Edit <code>pages/popup/src/Popup.tsx</code>
-        </p>
-        <button
-          className={
-            'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
-            (isLight ? 'bg-blue-200 text-black' : 'bg-gray-700 text-white')
-          }
-          onClick={injectContentScript}>
-          Click to inject Content Script
-        </button>
-        <ToggleButton>{t('toggleTheme')}</ToggleButton>
-      </header>
+    <div className="App">
+      <div className="h-full flex flex-col gap-4">
+        <div className="flex-1 flex items-center justify-center">
+          <Button
+            onClick={async () => {
+              await onClickRegister();
+              window.close();
+            }}
+            className="bg-blue-500 hover:bg-blue-400">
+            このページを登録する
+          </Button>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <Button onClick={saveExample} className="bg-green-500 hover:bg-green-400">
+            プロジェクト全体を登録する
+          </Button>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <Button className="bg-gray-500 hover:bg-gray-400">設定を開く</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Button: React.FC<{ className: string; onClick?: () => void; children: ReactNode }> = ({
+  className,
+  onClick,
+  children,
+}) => {
+  return (
+    <div className="flex-1 flex items-center justify-center">
+      <button onClick={onClick} className={`${className} text-white px-4 py-2 rounded w-full h-full`}>
+        {children}
+      </button>
     </div>
   );
 };
