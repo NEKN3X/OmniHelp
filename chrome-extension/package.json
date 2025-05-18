@@ -23,6 +23,7 @@
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
     "fuse.js": "^7.1.0",
+    "ts-pattern": "^5.7.0",
     "vite-plugin-node-polyfills": "^0.23.0",
     "webextension-polyfill": "^0.12.0"
   },
@@ -33,6 +34,7 @@
     "@extension/vite-config": "workspace:*",
     "@laynezh/vite-plugin-lib-assets": "^0.6.1",
     "magic-string": "^0.30.10",
-    "ts-loader": "^9.5.1"
+    "ts-loader": "^9.5.1",
+    "vitest": "^3.1.3"
   }
 }
