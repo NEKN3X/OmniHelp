@@ -10,6 +10,7 @@ export default defineConfig([
     rules: {
       'prefer-const': 'error',
       '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
   eslintConfigPrettier,
