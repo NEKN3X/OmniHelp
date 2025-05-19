@@ -1,7 +1,7 @@
-import '@src/Popup.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
+import '@src/Popup.css';
+import { onClickRegister, onClickUnregister } from '@src/register';
 import { ReactNode } from 'react';
-import { onClickRegister } from '@src/register';
 import { saveExample } from '../../../chrome-extension/src/storage';
 
 // ボタンを3つ並べる
@@ -24,7 +24,17 @@ const Popup = () => {
         </div>
         <div className="flex-1 flex items-center justify-center">
           <Button onClick={saveExample} className="bg-green-500 hover:bg-green-400">
-            プロジェクト全体を登録する
+            このプロジェクト全体を登録する
+          </Button>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <Button
+            onClick={async () => {
+              await onClickUnregister();
+              window.close();
+            }}
+            className="bg-yellow-500 hover:bg-yellow-400">
+            このページの登録を解除する
           </Button>
         </div>
         <div className="flex-1 flex items-center justify-center">
