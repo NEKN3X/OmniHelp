@@ -15,10 +15,15 @@ export const storageKey = (key: number) => `suggests-${key}`;
 export const getStorageKey = async (str: string) => storageKey(await hash(str));
 
 export const getSuggests = (
-  key: string
-): Promise<{ [key: string]: Suggest[] }> => browser.storage.local.get(key);
+  keys: string | string[]
+): Promise<{ [key: string]: Suggest[] }> => browser.storage.local.get(keys);
 export const setSuggestions = (key: string, suggests: Suggest[]) =>
   browser.storage.local.set({ [key]: suggests });
+export const getAllSuggests = () => {
+  // 0~255の整数をキーにして、suggestsを取得する
+  const keys = Array.from({ length: 256 }, (_, i) => storageKey(i));
+  return getSuggests(keys);
+};
 
 export const addSuggest = async (suggest: Suggest) => {
   const key = await getStorageKey(suggest.url);

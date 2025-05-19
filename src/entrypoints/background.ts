@@ -1,18 +1,18 @@
 import { search } from '@/utils/search';
+import { getAllSuggests } from '@/utils/storage';
 
 export default defineBackground(() => {
-  browser.omnibox.onInputChanged.addListener((text, suggest) => {
-    browser.storage.local.get(null, (v) => {
-      const values: Suggest[][] = Object.values(v);
-      const data = values.flat().flatMap((x) =>
+  browser.omnibox.onInputChanged.addListener(async (text, suggest) => {
+    const data = Object.values(await getAllSuggests())
+      .flat()
+      .flatMap((x) =>
         x.expanded.map((y) => ({
           content: x.url,
           description: y,
         }))
       );
-      const result = search(data, text);
-      suggest(result);
-    });
+    const result = search(data, text);
+    suggest(result);
   });
 
   browser.omnibox.onInputEntered.addListener((text, dis) => {
