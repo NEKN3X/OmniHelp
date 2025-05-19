@@ -1,12 +1,13 @@
-import './App.css';
+import Card from '@/components/Card';
+import InputHelp from '@/components/InputHelp';
+import '~/assets/App.css';
 
 function App() {
   return (
     <>
-      <div className="card">
-        aaa
-        <button onClick={() => saveExampleHelp()}>Save Example</button>
-      </div>
+      <Card>
+        <InputHelp />
+      </Card>
     </>
   );
 }
