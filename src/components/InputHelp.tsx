@@ -1,18 +1,42 @@
-import { cn } from '@/utils/cn';
 import { expand } from '@/utils/parser/helpfeel';
-import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { registerScrapbox } from '@/utils/register';
+import { GoPlus } from 'react-icons/go';
 import { IoClose } from 'react-icons/io5';
-import { TbTriangleInvertedFilled } from 'react-icons/tb';
 
 const InputHelp: React.FC = () => {
   const [text, setText] = useState<string>('');
   const [help, setHelp] = useState<Help[]>([]);
   const url = useRef<string>('');
+  const open = useRef<string>(null);
+  const info = scrapboxInfo(url.current);
+  const [scrapboxHelps, setScrapboxHelps] = useState<string[]>([]);
   useEffect(() => {
     browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       const currentTab = tabs[0];
       if (!currentTab) return;
       url.current = currentTab.url || '';
+      const info = scrapboxInfo(url.current);
+      if (!info) return;
+      if (info.project !== '' && info.title !== '') {
+        browser.scripting
+          .executeScript<string[], { text: string }[]>({
+            target: { tabId: currentTab.id! },
+            files: ['content-scripts/scrapbox.js'],
+          })
+          .then((x) => {
+            const lines = x[0].result?.map((x) => x.text.trim());
+            console.log('lines', lines);
+            const helps = lines
+              ?.filter((x) => /^\?\s/.test(x))
+              .map((x) => x.replace(/^\?\s/, ''));
+            console.log('helps', helps);
+            open.current =
+              lines
+                ?.filter((x) => /^%\s+(echo|open)\s+(.*)/.test(x))[0]
+                .replace(/^%\s+(echo|open)\s+/, '') || '';
+            setScrapboxHelps(helps || []);
+          });
+      }
     });
   }, []);
   useEffect(() => {
@@ -54,7 +78,7 @@ const InputHelp: React.FC = () => {
           <div className="flex items-center">? </div>
           <input
             autoFocus
-            className="rounded-sm border-1 border-gray-500 px-1"
+            className="flex-1 rounded-sm border-1 border-gray-500 px-1"
             name="helpInput"
             type="text"
             placeholder="Helpfeel記法で入力"
@@ -73,32 +97,125 @@ const InputHelp: React.FC = () => {
           </button>
         </form>
         <div className="text-left select-none">
-          <div className="after:pl-0.5">展開後</div>
+          <div>展開後</div>
           {expanded.length > 0 && (
-            <ol className="list-outside list-none pl-2 text-xs tracking-wide">
+            <ol className="list-outside list-none text-sm tracking-wide">
               {expanded.map((x) => (
-                <li key={x}>{x}</li>
+                <li key={x}>・{x}</li>
               ))}
             </ol>
           )}
         </div>
-        <hr className="text-gray-300" />
-        <div className="text-left select-none">
-          <div className="after:pl-0.5">このページのヘルプ</div>
-          <ol className="list-outside list-none tracking-wide">
-            {help.map((x) => (
-              <li className="flex pl-2 hover:bg-gray-50" key={x.command}>
-                <div className="flex-1">{x.command}</div>
-                <div
-                  onClick={() => removeHelp(url.current, x.command)}
+        {help.length > 0 && (
+          <>
+            <hr className="text-gray-300" />
+            <div className="text-left select-none">
+              <div>このページのヘルプ</div>
+              <ol className="list-outside list-none tracking-wide">
+                {help.map((x) => (
+                  <li className="flex hover:bg-gray-50" key={x.command}>
+                    <div className="flex-1">・{x.command}</div>
+                    <div
+                      onClick={() => removeHelp(url.current, x.command)}
+                      className="flex items-center p-1 hover:bg-red-50 hover:text-red-400"
+                    >
+                      <IoClose />
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </>
+        )}
+        {scrapboxHelps.length > 0 && (
+          <>
+            <hr className="text-gray-300" />
+            <div className="text-left select-none">
+              <div className="flex hover:bg-gray-50">
+                <span className="flex-1">このページのヘルプを取り込む</span>
+                <span
+                  className="flex items-center p-1 hover:bg-green-50 hover:text-green-400"
+                  onClick={() => {
+                    registerScrapbox(
+                      open.current || url.current,
+                      scrapboxHelps,
+                      url.current
+                    );
+                  }}
+                >
+                  <GoPlus />
+                </span>
+                <span
+                  onClick={() => removeScrapboxHelp(url.current)}
                   className="flex items-center p-1 hover:bg-red-50 hover:text-red-400"
                 >
                   <IoClose />
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
+                </span>
+              </div>
+              <ol className="list-outside list-none tracking-wide">
+                {scrapboxHelps.map((x, i) => (
+                  <li
+                    className="overflow-hidden text-ellipsis whitespace-nowrap"
+                    key={`${i}-${x}`}
+                  >
+                    ・{x}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </>
+        )}
+        {info?.project !== '' && info?.title === '' && (
+          <>
+            <hr />
+            <div className="flex hover:bg-gray-50">
+              <span className="flex-1">このプロジェクトのヘルプを取り込む</span>
+              <span
+                className="flex items-center p-1 hover:bg-green-50 hover:text-green-400"
+                onClick={() => {
+                  browser.tabs
+                    .query({ active: true, currentWindow: true })
+                    .then((tabs) => {
+                      const currentTab = tabs[0];
+                      if (!currentTab) return;
+                      browser.scripting
+                        .executeScript<
+                          string[],
+                          { title: string; helpfeels: string[] }[]
+                        >({
+                          target: { tabId: currentTab.id! },
+                          files: ['content-scripts/project.js'],
+                        })
+                        .then((x) => {
+                          const pages = x[0].result
+                            ?.filter((x) => x.helpfeels.length > 0)
+                            .map((x) => ({
+                              title: x.title,
+                              helpfeels: x.helpfeels.map((x) => x.trim()),
+                            }));
+                          console.log('pages', pages);
+                          pages?.forEach((x) => {
+                            registerScrapbox(
+                              `${url.current}${x.title}`,
+                              x.helpfeels,
+                              `${url.current}${x.title}`
+                            );
+                          });
+                        });
+                    });
+                }}
+              >
+                <GoPlus />
+              </span>
+              <span
+                onClick={() => {}}
+                className="flex items-center p-1 hover:bg-red-50 hover:text-red-400"
+              >
+                <IoClose />
+              </span>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

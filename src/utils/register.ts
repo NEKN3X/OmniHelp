@@ -1,10 +1,14 @@
 export const unregister = async () => {};
 
-const registerScrapboxPage = () => {};
-const registerScrapboxProject = () => {};
-const registerPage = async (url: string, command: string) => {
+export const registerScrapbox = async (
+  url: string,
+  commands: string[],
+  page: string
+) => {
+  if (url === '' || commands.length === 0) return;
+
   try {
-    await addHelp(url, command);
+    await setScrapboxHelp(url, commands, page);
   } catch (e) {
     console.error('Error expanding command', e);
   }
@@ -12,11 +16,10 @@ const registerPage = async (url: string, command: string) => {
 
 export const register = async (url: string, command: string) => {
   if (url === '' || command === '') return;
-  const m = url.match(/scrapbox\.io\/([a-zA-Z0-9-]+)(\/(.*))?$/);
-  console.log('register', url, command);
-  console.log('m', m);
 
-  if (m && m[1] && m[3]) registerScrapboxPage();
-  else if (m && m[1] && !m[3]) registerScrapboxProject();
-  else registerPage(url, command);
+  try {
+    await addHelpPage(url, command);
+  } catch (e) {
+    console.error('Error expanding command', e);
+  }
 };

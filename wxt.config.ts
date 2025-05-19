@@ -6,7 +6,15 @@ export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react', '@wxt-dev/auto-icons'],
   manifest: {
-    permissions: ['storage', 'unlimitedStorage', 'search', 'tabs'],
+    name: 'OmniHelp',
+    permissions: [
+      'storage',
+      'unlimitedStorage',
+      'search',
+      'tabs',
+      'scripting',
+      'activeTab',
+    ],
     omnibox: { keyword: '>' },
   },
   vite: () => ({

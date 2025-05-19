@@ -6,8 +6,12 @@ export const saveExampleHelp = async () => {
   helpData.setValue(exampleHelps);
 };
 
-export const addHelp = async (url: string, command: string) => {
-  const help = makeHelp(url, command);
+export const addHelpPage = async (
+  url: string,
+  command: string,
+  page?: string
+) => {
+  const help = makeHelp(url, command, page);
   const data = await helpData.getValue();
   helpData.setValue([
     ...data.filter(
@@ -15,6 +19,20 @@ export const addHelp = async (url: string, command: string) => {
     ),
     help,
   ]);
+};
+
+export const setScrapboxHelp = async (
+  url: string,
+  commands: string[],
+  page: string
+) => {
+  const helps = commands.map((x) => makeHelp(url, x, page));
+  const data = await helpData.getValue();
+  helpData.setValue([...data.filter((x) => x.page !== page), ...helps]);
+};
+export const removeScrapboxHelp = async (page: string) => {
+  const data = await helpData.getValue();
+  helpData.setValue(data.filter((x) => x.page !== page));
 };
 
 export const removeHelp = async (url: string, command: string) => {

@@ -1,6 +1,13 @@
 export default defineContentScript({
-  matches: ['*://*.google.com/*'],
-  main() {
-    console.log('Hello content.');
+  matches: ['*://scrapbox.io/*'],
+  main(ctx) {
+    console.log('Hello from content script!');
+    browser.runtime
+      .connect({ name: 'OmniHelp' })
+      .onMessage.addListener((message) => {
+        if (message.type === 'scrapbox') {
+          console.log('Received message from background:', message);
+        }
+      });
   },
 });
