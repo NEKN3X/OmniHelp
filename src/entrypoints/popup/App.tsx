@@ -5,7 +5,7 @@ function App() {
     <>
       <div className="card">
         aaa
-        <button onClick={() => saveExampleSuggests()}>Save Example</button>
+        <button onClick={() => saveExampleHelp()}>Save Example</button>
       </div>
     </>
   );

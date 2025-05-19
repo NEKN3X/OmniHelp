@@ -5,7 +5,7 @@ export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    permissions: ['storage', 'search', 'tabs'],
+    permissions: ['storage', 'unlimitedStorage', 'search', 'tabs'],
     omnibox: { keyword: '>' },
   },
 });

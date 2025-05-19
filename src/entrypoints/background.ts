@@ -1,9 +1,9 @@
 import { search } from '@/utils/search';
-import { getAllSuggests } from '@/utils/storage';
+import { helpData } from '@/utils/storage';
 
 export default defineBackground(() => {
   browser.omnibox.onInputChanged.addListener(async (text, suggest) => {
-    const data = Object.values(await getAllSuggests())
+    const data = Object.values(await helpData.getValue())
       .flat()
       .flatMap((x) =>
         x.expanded.map((y) => ({

@@ -1,4 +1,4 @@
-interface Suggest {
+interface Help {
   url: string;
   command: string;
   expanded: string[];
