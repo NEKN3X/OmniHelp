@@ -12,4 +12,9 @@ export default defineConfig({
   vite: () => ({
     plugins: [tailwindcss()],
   }),
+  imports: {
+    eslintrc: {
+      enabled: 9,
+    },
+  },
 });
