@@ -33,7 +33,7 @@ import { bind, orElse, parse, Parser, pure, sat, some, symbol } from './parser';
 // 3. [['xyzabc', 'xyz123'], 'xyz(あいう)']
 // 4. [['xyzabc', 'xyz123', 'xyzあいう'], '']
 
-const letter = sat((x) => /[^\(\)\|]/.test(x));
+const letter = sat((x) => /[^()|]/.test(x));
 const str: Parser<string[]> = bind(some(letter), (s) => pure([s.join('')]));
 
 export const factor: Parser<string[]> = orElse(
@@ -68,8 +68,8 @@ export const expand = (input: string) => {
     .with([], () => {
       throw new Error('Invalid input');
     })
-    .with(P.array([P._, '']), ([[n, _]]) => n)
-    .with(P.array([P._, P.string]), ([[_, out]]) => {
+    .with(P.array([P._, '']), ([[n]]) => n)
+    .with(P.array([P._, P.string]), ([[, out]]) => {
       throw new Error(`Unused input: ${out}`);
     })
     .exhaustive();

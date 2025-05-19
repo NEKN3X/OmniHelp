@@ -5,10 +5,11 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default defineConfig([
   js.configs.recommended,
-  ts.configs.recommended,
+  ...ts.configs.recommended,
   {
     rules: {
       'prefer-const': 'error',
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
   eslintConfigPrettier,
