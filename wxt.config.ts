@@ -15,7 +15,7 @@ export default defineConfig({
       'scripting',
       'activeTab',
     ],
-    omnibox: { keyword: '>' },
+    omnibox: { keyword: '.' },
   },
   vite: () => ({
     plugins: [tailwindcss()],
