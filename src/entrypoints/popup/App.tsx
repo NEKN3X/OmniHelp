@@ -1,7 +1,3 @@
-import Card from '@/components/Card';
-import FormHelp from '@/components/FormHelp';
-import ListExpanded from '@/components/ListExpanded';
-import ListHelp from '@/components/ListHelp';
 import { atom } from 'jotai';
 import '~/assets/App.css';
 
@@ -21,6 +17,7 @@ function App() {
           <ListExpanded />
           <ListHelp />
           <ListScrapboxHelp />
+          <ImportGlossary />
         </div>
       </Card>
     </>

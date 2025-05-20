@@ -26,3 +26,15 @@ export const scrapboxInfo = (url: string) => {
     title: m[3],
   };
 };
+
+export const extractGlossary = (page: string, lines: string[]): Glossary => {
+  const glossary = lines.filter((x) => /^(.*):\s*`(.*)`/.test(x));
+  const data: Glossary = new Map();
+  glossary.forEach((x) => {
+    const m = x.match(/^(.*):\s*`(.*)`/);
+    if (!m || !m[0] || !m[1] || !m[2]) return;
+    data.set(m[1], m[2]);
+  });
+  console.log(data);
+  return data;
+};

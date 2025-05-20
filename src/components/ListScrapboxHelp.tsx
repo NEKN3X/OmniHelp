@@ -1,6 +1,5 @@
 import { tabAtom, urlAtom } from '@/entrypoints/popup/App';
 import { atom, useAtom, useSetAtom } from 'jotai';
-import { CiBookmark } from 'react-icons/ci';
 
 export const scrapboxInfoAtom = atom(async (get) => {
   const url = await get(urlAtom);
