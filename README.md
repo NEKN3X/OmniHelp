@@ -26,3 +26,4 @@
 
 ## 追加したい機能
 - [ ] Glossary
+- [ ] import/export
