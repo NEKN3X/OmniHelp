@@ -11,39 +11,36 @@ export const scrapboxInfoAtom = atom(async (get) => {
 const scrapboxHelpsAtom = atom(async (get) => {
   const info = await get(scrapboxInfoAtom);
   const tab = await get(tabAtom);
+  const url = await get(urlAtom);
   if (!info) return [];
   if (!tab?.id) return [];
-  const lines = await browser.scripting.executeScript<
-    string[],
-    { text: string }[]
-  >({
-    target: { tabId: tab.id },
-    files: ['content-scripts/scrapbox.js'],
-  });
-  console.log('lines', lines);
+  if (!url) return [];
+  const lines = await browser.scripting
+    .executeScript<string[], { text: string }[]>({
+      target: { tabId: tab.id },
+      files: ['content-scripts/scrapbox.js'],
+    })
+    .then((res) => res[0].result?.map((x) => x.text.trim()));
+  if (!lines) return [];
+  return extractHelp(url, lines);
 });
 
 const ListScrapboxHelp: React.FC = () => {
   const [url] = useAtom(urlAtom);
   const [scrapboxInfo] = useAtom(scrapboxInfoAtom);
-  const [lines] = useAtom(scrapboxHelpsAtom);
+  const [extracted] = useAtom(scrapboxHelpsAtom);
 
   return (
     <>
-      {url && scrapboxInfo?.title && lines && (
+      {url && scrapboxInfo?.title && extracted && (
         <>
           <hr className="text-gray-300" />
           <div className="text-left select-none">
-            <div className="flex hover:bg-gray-50">
+            <div className="flex">
               <span className="flex-1">このページのヘルプを取り込む</span>
               <span
                 className="flex items-center p-1 hover:bg-green-50 hover:text-green-400"
-                onClick={() => {
-                  // const data = scrapboxHelps.map((x) =>
-                  //   makeHelp(open.current || url.current, x, url.current)
-                  // );
-                  // registerHelp(data);
-                }}
+                onClick={() => registerHelp(extracted)}
               >
                 <GoPlus />
               </span>
@@ -55,12 +52,12 @@ const ListScrapboxHelp: React.FC = () => {
               </span>
             </div>
             <ol className="list-outside list-none tracking-wide">
-              {lines.map((x, i) => (
+              {extracted.map((x, i) => (
                 <li
                   className="overflow-hidden text-ellipsis whitespace-nowrap"
-                  key={`${i}-${x}`}
+                  key={`${i}-${x.command}-${x.open}`}
                 >
-                  ・{x}
+                  ・{x.command}
                 </li>
               ))}
             </ol>
