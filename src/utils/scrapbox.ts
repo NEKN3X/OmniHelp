@@ -35,6 +35,5 @@ export const extractGlossary = (page: string, lines: string[]): Glossary => {
     if (!m || !m[0] || !m[1] || !m[2]) return;
     data.set(m[1], m[2]);
   });
-  console.log(data);
   return data;
 };
