@@ -30,14 +30,14 @@ export const registerHelp = async (helps: Help[]) => {
   const pages = new Set(scrapboxHelps.map((x) => x.page));
   const newData = [
     ...data.filter(
-      (x) =>
-        (isNormalHelp(x) &&
-          !normalHelps.some(
-            (y) => y.open === x.open && y.command === x.command
-          )) ||
-        (isScrapboxHelp(x) && !pages.has(x.page))
+      (x) => isNormalHelp(x) || (isScrapboxHelp(x) && !pages.has(x.page))
     ),
-    ...normalHelps,
+    ...normalHelps.filter(
+      (x) =>
+        !data.find(
+          (y) => isNormalHelp(y) && y.open === x.open && y.command === x.command
+        )
+    ),
     ...scrapboxHelps,
   ];
 

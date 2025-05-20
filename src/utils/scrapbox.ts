@@ -13,7 +13,7 @@ export const getHelpfeelFromScrapbox = async (url: string) => {
 
 export const scrapboxInfo = (url: string) => {
   const m = url.match(/scrapbox\.io\/([a-zA-Z0-9-]+)(\/(.*))?$/);
-  if (!m) return null;
+  if (!m) return undefined;
   return {
     project: m[1],
     title: m[3],
