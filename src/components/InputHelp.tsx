@@ -33,7 +33,7 @@ const InputHelp: React.FC = () => {
             open.current =
               lines
                 ?.filter((x) => /^%\s+(echo|open)\s+(.*)/.test(x))[0]
-                .replace(/^%\s+(echo|open)\s+/, '') || '';
+                ?.replace(/^%\s+(echo|open)\s+/, '') || '';
             setScrapboxHelps(helps || []);
           });
       }
@@ -41,10 +41,10 @@ const InputHelp: React.FC = () => {
   }, []);
   useEffect(() => {
     helpData.getValue().then((data) => {
-      setHelp(data.filter((x) => x.url === url.current));
+      setHelp(data.filter((x) => x.url === url.current && x.page === ''));
     });
     const unwatch = helpData.watch((data) => {
-      setHelp(data.filter((x) => x.url === url.current));
+      setHelp(data.filter((x) => x.url === url.current && x.page === ''));
     });
     return () => {
       unwatch();
