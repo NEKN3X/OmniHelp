@@ -1,3 +1,4 @@
+import { equals } from 'ramda';
 import { expand } from './parser/helpfeel';
 
 export const isScrapboxHelp = (help: Help): help is ScrapboxHelp =>
@@ -62,4 +63,15 @@ export const unregisterScrapboxHelp = async (page: string) => {
   helpData.setValue(
     data.filter((x) => !(isScrapboxHelp(x) && x.page === page))
   );
+};
+
+export const diffScrapboxHelp = async (page: string, helps: Help[]) => {
+  const data = await helpData.getValue();
+  const old = new Set(
+    data.filter((x) => isScrapboxHelp(x)).filter((x) => x.page === page)
+  );
+  const help = new Set(
+    helps.filter((x) => isScrapboxHelp(x) && x.page === page)
+  );
+  return equals(old, help);
 };

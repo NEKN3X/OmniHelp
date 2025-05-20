@@ -17,7 +17,7 @@ const ListHelp: React.FC = () => {
       {url && helpList.length > 0 && (
         <>
           <hr className="text-gray-300" />
-          <div className="text-left select-none">
+          <div>
             <div>このページのヘルプ</div>
             <ol className="list-outside list-none tracking-wide">
               {helpList.map((x) => (

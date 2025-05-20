@@ -1,14 +1,13 @@
 import { tabAtom, urlAtom } from '@/entrypoints/popup/App';
-import { atom, useAtom } from 'jotai';
-import { GoPlus } from 'react-icons/go';
-import { IoClose } from 'react-icons/io5';
+import { atom, useAtom, useSetAtom } from 'jotai';
+import { CiBookmark } from 'react-icons/ci';
 
 export const scrapboxInfoAtom = atom(async (get) => {
   const url = await get(urlAtom);
   if (!url) return undefined;
   return scrapboxInfo(url);
 });
-const scrapboxHelpsAtom = atom(async (get) => {
+const extractedAtom = atom(async (get) => {
   const info = await get(scrapboxInfoAtom);
   const tab = await get(tabAtom);
   const url = await get(urlAtom);
@@ -24,35 +23,43 @@ const scrapboxHelpsAtom = atom(async (get) => {
   if (!lines) return [];
   return extractHelp(url, lines);
 });
+const scrapboxHelpsAtom = atom<Help[]>([]);
 
 const ListScrapboxHelp: React.FC = () => {
   const [url] = useAtom(urlAtom);
   const [scrapboxInfo] = useAtom(scrapboxInfoAtom);
-  const [extracted] = useAtom(scrapboxHelpsAtom);
+  const [helps, setHelps] = useAtom(scrapboxHelpsAtom);
+  const [extracted] = useAtom(extractedAtom);
+
+  useEffect(() => {
+    getAllHelps().then((data) => {
+      setHelps(data.filter((x) => isScrapboxHelp(x) && x.page === url));
+    });
+    const unwatch = watchHelps((data) => {
+      setHelps(data.filter((x) => isScrapboxHelp(x) && x.page === url));
+    });
+    return () => {
+      unwatch();
+    };
+  }, []);
+  useEffect(() => {
+    if (extracted.length > 0) {
+      registerHelp(extracted);
+    } else {
+      if (!url) return;
+      unregisterScrapboxHelp(url);
+    }
+  }, []);
 
   return (
     <>
-      {url && scrapboxInfo?.title && extracted && (
+      {url && scrapboxInfo?.title && helps.length > 0 && (
         <>
           <hr className="text-gray-300" />
-          <div className="text-left select-none">
-            <div className="flex">
-              <span className="flex-1">このページのヘルプを取り込む</span>
-              <span
-                className="flex items-center p-1 hover:bg-green-50 hover:text-green-400"
-                onClick={() => registerHelp(extracted)}
-              >
-                <GoPlus />
-              </span>
-              <span
-                onClick={() => unregisterScrapboxHelp(url)}
-                className="flex items-center p-1 hover:bg-red-50 hover:text-red-400"
-              >
-                <IoClose />
-              </span>
-            </div>
+          <div>
+            <div>このページのHelpfeel記法</div>
             <ol className="list-outside list-none tracking-wide">
-              {extracted.map((x, i) => (
+              {helps.map((x, i) => (
                 <li
                   className="overflow-hidden text-ellipsis whitespace-nowrap"
                   key={`${i}-${x.command}-${x.open}`}
