@@ -1,5 +1,4 @@
 import { expand } from '@/utils/parser/helpfeel';
-import { registerScrapbox } from '@/utils/register';
 import { GoPlus } from 'react-icons/go';
 import { IoClose } from 'react-icons/io5';
 
@@ -40,11 +39,15 @@ const InputHelp: React.FC = () => {
     });
   }, []);
   useEffect(() => {
-    helpData.getValue().then((data) => {
-      setHelp(data.filter((x) => x.url === url.current && x.page === ''));
+    getAllHelps().then((data) => {
+      setHelp(
+        data.filter((x) => x.open === url.current && x.page === undefined)
+      );
     });
-    const unwatch = helpData.watch((data) => {
-      setHelp(data.filter((x) => x.url === url.current && x.page === ''));
+    const unwatch = watchHelps((data) => {
+      setHelp(
+        data.filter((x) => x.open === url.current && x.page === undefined)
+      );
     });
     return () => {
       unwatch();
@@ -70,7 +73,7 @@ const InputHelp: React.FC = () => {
             const input = form.elements.namedItem(
               'helpInput'
             ) as HTMLInputElement;
-            register(url.current, input.value);
+            registerHelp([makeHelp(url.current, input.value)]);
             setText('');
             // window.close();
           }}
@@ -116,7 +119,7 @@ const InputHelp: React.FC = () => {
                   <li className="flex hover:bg-gray-50" key={x.command}>
                     <div className="flex-1">・{x.command}</div>
                     <div
-                      onClick={() => removeHelp(url.current, x.command)}
+                      onClick={() => unregisterHelp(url.current, x.command)}
                       className="flex items-center p-1 hover:bg-red-50 hover:text-red-400"
                     >
                       <IoClose />
@@ -136,17 +139,16 @@ const InputHelp: React.FC = () => {
                 <span
                   className="flex items-center p-1 hover:bg-green-50 hover:text-green-400"
                   onClick={() => {
-                    registerScrapbox(
-                      open.current || url.current,
-                      scrapboxHelps,
-                      url.current
+                    const data = scrapboxHelps.map((x) =>
+                      makeHelp(open.current || url.current, x, url.current)
                     );
+                    registerHelp(data);
                   }}
                 >
                   <GoPlus />
                 </span>
                 <span
-                  onClick={() => removeScrapboxHelp(url.current)}
+                  onClick={() => unregisterScrapboxHelp(url.current)}
                   className="flex items-center p-1 hover:bg-red-50 hover:text-red-400"
                 >
                   <IoClose />
@@ -195,11 +197,14 @@ const InputHelp: React.FC = () => {
                             }));
                           console.log('pages', pages);
                           pages?.forEach((x) => {
-                            registerScrapbox(
-                              `${url.current}${x.title}`,
-                              x.helpfeels,
-                              `${url.current}${x.title}`
+                            const data = x.helpfeels.map((y) =>
+                              makeHelp(
+                                `${url.current}${x.title}`,
+                                y,
+                                `${url.current}${x.title}`
+                              )
                             );
+                            registerHelp(data);
                           });
                         });
                     });

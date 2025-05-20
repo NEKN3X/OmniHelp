@@ -1,16 +1,14 @@
 import { search } from '@/utils/search';
-import { helpData } from '@/utils/storage';
+import { getAllHelps } from '@/utils/help';
 
 export default defineBackground(() => {
   browser.omnibox.onInputChanged.addListener(async (text, suggest) => {
-    const data = Object.values(await helpData.getValue())
-      .flat()
-      .flatMap((x) =>
-        x.expanded.map((y) => ({
-          content: x.url,
-          description: y,
-        }))
-      );
+    const data = (await getAllHelps()).flatMap((x) =>
+      x.expanded.map((y) => ({
+        content: x.open,
+        description: y,
+      }))
+    );
     const result = search(data, text);
     suggest(result);
   });
