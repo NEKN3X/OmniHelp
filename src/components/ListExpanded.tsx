@@ -20,8 +20,8 @@ const ListExpanded: React.FC = () => {
         <>
           <div>展開後</div>
           <ol className="list-outside list-none text-sm tracking-wide">
-            {expanded.map((x) => (
-              <li key={x}>・{x}</li>
+            {expanded.map((x, i) => (
+              <li key={`${i}-${x}`}>・{x}</li>
             ))}
           </ol>
         </>
