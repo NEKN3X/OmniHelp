@@ -11,6 +11,4 @@ interface ScrapboxHelp extends Help {
   page: string;
 }
 
-interface Glossary {
-  [key: string]: string;
-}
+type Glossary = Map<string, string>;
