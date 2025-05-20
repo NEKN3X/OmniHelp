@@ -17,7 +17,9 @@ function App() {
           <ListExpanded />
           <ListHelp />
           <ListScrapboxHelp />
+          <hr className="text-gray-300" />
           <ImportGlossary />
+          <ExportStorage />
         </div>
       </Card>
     </>
