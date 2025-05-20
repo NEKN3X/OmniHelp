@@ -25,5 +25,5 @@
 - `https://helpfeel.com/help/?q=`のようなURLを保存しておくとそのページの検索を素早く実行できる
 
 ## 追加したい機能
-- [ ] Glossary
+- [x] Glossary
 - [ ] import/export
