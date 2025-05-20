@@ -1,2 +1,3 @@
-- [masui/HelpLine](https://github.com/masui/HelpLine)のomnibox版の機能を実装する
-- Manifest V3に対応する
+# WXT + React
+
+This template should help get you started developing with React in WXT.
