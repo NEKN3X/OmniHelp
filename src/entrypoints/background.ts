@@ -5,7 +5,7 @@ export default defineBackground(() => {
   browser.omnibox.onInputChanged.addListener(async (text, suggest) => {
     const data = (await getAllHelps()).flatMap((x) =>
       x.expanded.map((y) => ({
-        content: x.open,
+        content: decodeURIComponent(x.open),
         description: y,
       }))
     );
@@ -13,8 +13,8 @@ export default defineBackground(() => {
     suggest(result);
   });
 
-  browser.omnibox.onInputEntered.addListener((text, dis) => {
-    if (text.match(/^http/)) {
+  browser.omnibox.onInputEntered.addListener(async (text, dis) => {
+    if (/^http/.test(text)) {
       switch (dis) {
         case 'currentTab':
           browser.tabs.update({ url: text });

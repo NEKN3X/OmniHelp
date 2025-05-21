@@ -1,8 +1,9 @@
+import { activeTabs } from '@/utils/browser';
 import { atom } from 'jotai';
 import '~/assets/App.css';
 
 export const tabAtom = atom(async () => {
-  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+  const tabs = await activeTabs();
   if (tabs.length === 0) return undefined;
   return tabs[0];
 });
