@@ -7,7 +7,11 @@ export const tabAtom = atom(async () => {
   if (tabs.length === 0) return undefined;
   return tabs[0];
 });
-export const urlAtom = atom((get) => get(tabAtom).then((tab) => tab?.url));
+export const urlAtom = atom((get) =>
+  get(tabAtom)
+    .then((tab) => tab?.url)
+    .then((url) => (url ? decodeURIComponent(url) : undefined))
+);
 
 function App() {
   return (

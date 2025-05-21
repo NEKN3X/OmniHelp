@@ -1,5 +1,5 @@
 import { tabAtom, urlAtom } from '@/entrypoints/popup/App';
-import { atom, useAtom, useSetAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 
 export const scrapboxInfoAtom = atom(async (get) => {
   const url = await get(urlAtom);
