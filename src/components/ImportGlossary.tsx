@@ -27,7 +27,10 @@ const ImportGlossary: React.FC = () => {
       {glossary && (
         <div className="text-right text-xs">
           <a
-            onClick={() => registerGlossary(glossary)}
+            onClick={async () => {
+              await registerGlossary(glossary);
+              await updateHelpsWithGlossary();
+            }}
             href=""
             rel="noopener noreferrer"
           >

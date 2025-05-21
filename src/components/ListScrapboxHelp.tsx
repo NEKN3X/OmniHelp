@@ -20,7 +20,7 @@ const extractedAtom = atom(async (get) => {
     })
     .then((res) => res[0].result?.map((x) => x.text.trim()));
   if (!lines) return [];
-  return extractHelp(url, lines);
+  return Promise.all(extractHelp(url, lines));
 });
 const scrapboxHelpsAtom = atom<Help[]>([]);
 

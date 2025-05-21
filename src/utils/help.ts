@@ -1,23 +1,23 @@
 import { equals } from 'ramda';
-import { expand } from './parser/helpfeel';
+import { expandWithGlossary } from './glossary';
 
 export const isScrapboxHelp = (help: Help): help is ScrapboxHelp =>
   help.page !== undefined;
 export const isNormalHelp = (help: Help): help is NormalHelp =>
   help.page === undefined;
 
-export const makeHelp = (
+export const makeHelp = async (
   open: string,
   command: string,
   page?: string
-): Help => ({
+): Promise<Help> => ({
   open,
   command,
-  expanded: expand(command),
+  expanded: await expandWithGlossary(command),
   ...(page ? { page } : {}),
 });
 
-const helpData = storage.defineItem<Help[]>('local:help', {
+export const helpData = storage.defineItem<Help[]>('local:help', {
   fallback: [],
 });
 

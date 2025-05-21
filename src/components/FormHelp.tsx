@@ -11,12 +11,12 @@ const FormHelp: React.FC = () => {
     <>
       <form
         className="flex gap-2"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           const form = e.target as HTMLFormElement;
           const input = form.elements.namedItem('command') as HTMLInputElement;
           if (!url) return;
-          const help = makeHelp(url, input.value);
+          const help = await makeHelp(url, input.value);
           registerHelp([help]);
           setCommand('');
           window.close();

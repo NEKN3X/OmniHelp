@@ -1,12 +1,11 @@
 import { atom, useAtom } from 'jotai';
 import { CommandAtom as commandAtom } from './FormHelp';
-import { expandWithGlossary, getGlossary } from '@/utils/glossary';
+import { expandWithGlossary } from '@/utils/glossary';
 
 export const expandedAtom = atom(async (get) => {
   try {
-    const glossary = await getGlossary();
     const command = get(commandAtom);
-    return expandWithGlossary(glossary)(command);
+    return await expandWithGlossary(command);
   } catch (e) {
     return [];
   }

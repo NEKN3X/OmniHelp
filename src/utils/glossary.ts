@@ -14,7 +14,8 @@ export const registerGlossary = async (value: Glossary) => {
   return data;
 };
 
-export const expandWithGlossary = (glossary: Glossary) => (text: string) => {
+export const expandWithGlossary = async (text: string) => {
+  const glossary = await getGlossary();
   const m = text.match(/{.*}/);
   if (!m) return expand(text);
   let command = text;
@@ -26,4 +27,15 @@ export const expandWithGlossary = (glossary: Glossary) => (text: string) => {
     });
   }
   return expand(command);
+};
+
+export const updateHelpsWithGlossary = async () => {
+  const data = await getAllHelps();
+  const newData = await Promise.all(
+    data.map(async (x) => ({
+      ...x,
+      expanded: await expandWithGlossary(x.command),
+    }))
+  );
+  await helpData.setValue(newData);
 };
